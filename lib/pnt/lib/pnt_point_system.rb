@@ -48,10 +48,10 @@ private
     return if pnt_filters.empty?
     
     PntHistory.transaction do
-      pnt_filters.each do |pnt_filter|
+      pnt_filters.each do |tmp_filter|
+        pnt_filter = PntFilter.find(tmp_filter.id)
         if pnt_filter.use_lock?
           next if PntFilter.lock_if_active(pnt_filter.id, pnt_filter.point).nil?
-          pnt_filter.save!
         end
         
         logger.info "pnt_filer, :#{pnt_filter.id}, point: #{pnt_filter.point}, user_id: #{base_user_id}"
@@ -85,6 +85,7 @@ private
         # ポイント配布制限チェック
         if pnt_filter.has_limit?
           if pnt_filter.stock < pnt_filter.point
+            pnt_filter.save!
             next
           else
             # 残量の減少

@@ -154,7 +154,6 @@ module PntPointSystemTestModule
     point = PntPoint.find_by_base_user_id(test_user.id)
     assert_equal(point.point, 160) # ポイント増加
 
-    
     # 2回め
     get :rule_day_target
     
@@ -176,7 +175,6 @@ module PntPointSystemTestModule
     point = PntPoint.find_by_base_user_id(test_user.id)
     assert_equal(point.point, 170) # ポイント増加
 
-    
     # 2回め
     get :stock_target
     
@@ -187,7 +185,7 @@ module PntPointSystemTestModule
   
   # 配布期間テスト
   # pnt_filter 2種類あるけど、片方は期間外
-  def test_add_with_stock
+  def test_add_with_term
     test_user = BaseUser.authenticate('four', 'test')
     @request.session[:base_user] = test_user
     
