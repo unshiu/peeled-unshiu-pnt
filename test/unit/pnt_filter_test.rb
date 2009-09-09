@@ -29,12 +29,11 @@ module PntFilterTestModule
     assert_equal(pnt_filters.size, 0) # 存在しない
   end
   
-  # 各処理にフィルタが存在を取得する find_target_filters のテスト
-  def test_find_target_filters
-    pnt_filters = PntFilter.find_target_filters('point_system_test', 'target')
+  define_method ('test: find_target_filters はconrollerとaction名を指定するとフィルタを取得できる') do
+    pnt_filters = PntFilter.find_target_filters('point_system_filter_test', 'target')
     assert_equal(pnt_filters.size, 1) # 1つ存在する
     
-    pnt_filters = PntFilter.find_target_filters('point_system_test', 'testtettest')
+    pnt_filters = PntFilter.find_target_filters('point_system_filter_test', 'testtettest')
     assert_equal(pnt_filters.size, 0) # 存在しない
   end
   

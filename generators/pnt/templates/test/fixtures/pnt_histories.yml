@@ -10,6 +10,7 @@
 #  deleted_at    :datetime
 #  message       :string(2000)    default(""), not null
 #  pnt_filter_id :integer(4)
+#  amount        :integer(4)      default(0)
 #
 
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html

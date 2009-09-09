@@ -15,42 +15,42 @@
 a:
   id: 1
   title: '通常テスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>
 b:
   id: 2
   title: 'エラー処理テスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'exception_target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>
 e:
   id: 5
   title: '回数制限有りテスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'rule_count_target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>
 f:
   id: 6
   title: '日数回数制限有りテスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'rule_day_target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>
 g:
   id: 7
   title: '配布制限テスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'stock_target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>
 h:
   id: 8
   title: '配布期間テスト'
-  controller_name: 'point_system_test'
+  controller_name: 'point_system_filter_test'
   action_name: 'term_target'
   created_at: <%= Time.now.to_s :db %>
   updated_at: <%= Time.now.to_s :db %>

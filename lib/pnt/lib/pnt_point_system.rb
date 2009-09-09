@@ -4,7 +4,8 @@
 # ポイント増減処理用のfiterを提供する
 # もしaction内の処理によりポイント増減処理を取り消したい場合は例外として 
 # params[:pnt_request_cancel] に　trueを設定する
-#
+# 商品の購入などfilterでは制御できないものはgiveをつかって個別に処理する
+# 
 # example)
 #
 # フィルターを有効化
@@ -27,6 +28,14 @@
 #
 module PntPointSystemModule
   
+  class << self
+    def included(base)
+      base.extend(ClassMethods)
+      base.class_eval do
+      end
+    end
+  end
+  
   def pnt_target_filter
     logger.debug "controller_name #{controller_name}: action_name #{action_name}"
     yield
@@ -37,25 +46,25 @@ module PntPointSystemModule
       exec_point_process 
     end
   end
-    
-private
   
+private
+
   def exec_point_process
     base_user_id = request.session[:base_user]
     return if base_user_id.nil? # 対象はログインユーザのみ
-    
+
     pnt_filters = PntFilter.find_target_filters(controller_name, action_name)
     return if pnt_filters.empty?
-    
+
     PntHistory.transaction do
       pnt_filters.each do |tmp_filter|
         pnt_filter = PntFilter.find(tmp_filter.id)
         if pnt_filter.use_lock?
           next if PntFilter.lock_if_active(pnt_filter.id, pnt_filter.point).nil?
         end
-        
+
         logger.info "pnt_filer, :#{pnt_filter.id}, point: #{pnt_filter.point}, user_id: #{base_user_id}"
-        
+
         point = PntPoint.find_base_user_point(pnt_filter.pnt_master_id, base_user_id)
         unless point
           point = PntPoint.new
@@ -63,7 +72,7 @@ private
           point.base_user_id = base_user_id
           point.point = 0
         end
-        
+
         # 回数制限チェック
         if !pnt_filter.rule_count.blank? && pnt_filter.rule_count > 0
           # 回数制限があれば制限範囲内の履歴をチェック
@@ -75,13 +84,13 @@ private
             # 回数のみの制限
             histories = point.pnt_histories.find(:all, :conditions => ['pnt_filter_id = ?', pnt_filter.id])
           end
-          
+
           if histories.size >= pnt_filter.rule_count
             # 制限回数を超えていればスキップ
             next
           end
         end
-        
+
         # ポイント配布制限チェック
         if pnt_filter.has_limit?
           if pnt_filter.stock < pnt_filter.point
@@ -93,7 +102,7 @@ private
             pnt_filter.save!
           end
         end
-        
+
         point.point += pnt_filter.point
         point.save!
 
@@ -110,7 +119,44 @@ private
     end
   rescue => e
     logger.error "exec_point_process!: #{e}"
-    # TODO ポイント処理を失敗したらどうしよう
   end
+    
+  module ClassMethods
+    
+    # 特定のポイントマスタID(pnt_master_id)のポイントをユーザID(base_user_id)に配布する。
+    # ポイントはマイナス値も指定可能だが0ポイント以下にはできない。事前チェックが必要なら個別に行うこと。
+    # 
+    # _param1_:: base_user_id 必須
+    # _param2_:: pnt_master_id　必須
+    # _param3_:: point　必須
+    # _param3_:: message　ポイント履歴用　必須
+    def pointregister(base_user_id, pnt_master_id, point, message)
+      
+      PntHistory.transaction do
+        pnt_point = PntPoint.find_base_user_point(pnt_master_id, base_user_id)
+        unless pnt_point
+          pnt_point = PntPoint.new
+          pnt_point.pnt_master_id = pnt_master_id
+          pnt_point.base_user_id = base_user_id
+          pnt_point.point = 0
+        end
+        
+        pnt_point.point += point
+        pnt_point.save!
+
+        pnt_history = PntHistory.new
+        pnt_history.pnt_point_id = pnt_point.id
+        pnt_history.difference = point
+        pnt_history.message = message
+        pnt_history.amount = pnt_point.point
+        pnt_history.save!
+
+      end
+    rescue => e
+      logger.error "exec_point_process!: #{e}"
+    end
+  end
+  
+
 end
   
