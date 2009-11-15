@@ -5,6 +5,14 @@
 
 <h3><%= t('view.noun.pnt_import') %></h3>
 
+<p>アップロードするファイルは以下の形式に沿ってください。</p>
+<br/>
+<ul class="list">
+	<li>ポイントマスタID, ユーザID, 増減ポイント数, ポイント履歴へのメッセージをCSV形式で記述してください</li>
+	<li>文字コードはUTF8です。</li>
+</ul>
+<br/>
+
 <% form_tag({:action => 'upload'}, {:multipart => true}) do %>
   <%= error_messages_for 'pnt_import_form' %>
 
